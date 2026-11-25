@@ -1,0 +1,70 @@
+%% CampusMart ERD (Mermaid) - matches sql/01_schema.sql
+%% Render: https://mermaid.live  or  VS Code "Markdown Preview Mermaid Support"
+erDiagram
+    category ||--o{ category : "parent_id (self)"
+    category ||--o{ product : "classifies"
+    supplier |o--o{ product : "supplies (nullable)"
+    customer ||--o{ "order" : "places"
+    "order" ||--|{ order_item : "contains (ON DELETE CASCADE)"
+    product ||--o{ order_item : "sold as"
+
+    category {
+        int id PK
+        nvarchar name UK
+        int parent_id FK
+        bit is_active
+        datetime2 created_at
+        datetime2 updated_at
+    }
+    supplier {
+        int id PK
+        nvarchar name UK
+        nvarchar contact_person
+        nvarchar phone
+        nvarchar city
+        bit is_active
+        datetime2 created_at
+        datetime2 updated_at
+    }
+    product {
+        int id PK
+        nvarchar sku UK
+        nvarchar name
+        decimal price "CHECK >= 0"
+        int stock_qty "CHECK >= 0"
+        int category_id FK
+        int supplier_id FK
+        bit is_active
+        datetime2 created_at
+        datetime2 updated_at
+    }
+    customer {
+        int id PK
+        nvarchar full_name
+        nvarchar email UK
+        nvarchar city
+        datetime2 registered_at
+        bit is_active
+        datetime2 created_at
+        datetime2 updated_at
+    }
+    "order" {
+        int id PK
+        nvarchar order_no UK "ORD-YYYYMMDD-NNN"
+        int customer_id FK
+        datetime2 order_date
+        decimal total_amount "CHECK >= 0"
+        bit is_active
+        datetime2 created_at
+        datetime2 updated_at
+    }
+    order_item {
+        int id PK
+        int order_id FK "UK with product_id"
+        int product_id FK
+        int quantity "CHECK > 0"
+        decimal unit_price "CHECK >= 0, snapshot"
+        decimal line_total "computed, persisted"
+        datetime2 created_at
+        datetime2 updated_at
+    }
